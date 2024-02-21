@@ -1,7 +1,7 @@
 import {Fragment, useContext} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
-import {DeleteDialogContext} from "@/app/components/contexts/DeleteContext";
+import {DeleteDialogContext} from "@/app/components/dialogs/DialogContext";
 
 export function DeleteEventDialog() {
 
