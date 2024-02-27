@@ -12,4 +12,13 @@ export interface EventType {
     color: string;
     name: string;
     iconUrl?: string;
+    isFiltered?:boolean;
+}
+
+export interface EventTypeOption {
+    readonly value: string;
+    readonly label: string;
+    readonly color: string;
+    readonly isFixed?: boolean;
+    readonly isDisabled?: boolean;
 }

@@ -6,17 +6,20 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
 import {EventSourceInput} from '@fullcalendar/core/index.js'
 import {DeleteEventDialog} from "@/app/components/dialogs/DeleteEventDialog";
-import {CreateDialogContext, DeleteDialogContext} from './components/dialogs/DialogContext'
+import {CreateDialogContext, DeleteDialogContext, FilterDialogContext} from './components/dialogs/DialogContext'
 import {CreateEventDialog} from "@/app/components/dialogs/CreateEventDialog";
-import {Event, EventType} from "@/app/EventObjects";
+import {Event, EventType, EventTypeOption} from "@/app/EventObjects";
+import {FilterEventDialog} from "@/app/components/dialogs/FilterEventDialog";
 
 // @ts-ignore
 
 export default function Home() {
 
     const [eventTypes, setEventTypes] = useState<EventType[]>([
-        {id: 0, color: "blue", name:"blue team", iconUrl: "blueTeamUrl"},
-        {id: 1, color: "green", name:" green team", iconUrl: "greenTeamUrl"},
+        {id: 0, color: "blue", name: "blue team", iconUrl: "blueTeamUrl"},
+        {id: 1, color: "green", name: " green team", iconUrl: "greenTeamUrl"},
+        {id: 2, color: "red", name: " red team", iconUrl: "redTeamUrl"},
+        {id: 3, color: "yellow", name: " yellow team", iconUrl: "yellowTeamUrl"},
     ])
 
     const [events, setEvents] = useState([
@@ -28,17 +31,24 @@ export default function Home() {
     ])
 
     const [allEvents, setAllEvents] = useState<Event[]>([])
+    const [filteredEventTypes, setFilteredEventTypes] = useState<EventType[]> ([]);
+
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [showFilterModal, setShowFilterModal] = useState(false)
     const [idToDelete, setIdToDelete] = useState<number | null>(null)
     const [newEvent, setNewEvent] = useState<Event>({
         title: '',
         start: '',
         allDay: false,
         id: 0,
-        eventType: {id: 0, color: "blue",name:"blueTeam", iconUrl: "blueTeamUrl"},
+        eventType: {id: 0, color: "blue", name: "blueTeam", iconUrl: "blueTeamUrl"},
         color: "blue"
     })
+
+    const filterEvents = () =>{
+
+    }
 
     useEffect(() => {
         let draggableEl = document.getElementById('draggable-el')
@@ -84,8 +94,18 @@ export default function Home() {
                                 interactionPlugin,
                                 timeGridPlugin
                             ]}
+                            customButtons={{
+                                filterButton: {
+                                    text: 'Filter events',
+                                    click: function () {
+                                       setShowFilterModal(true);
+                                    }
+                                }
+                            }
+                            }
+
                             headerToolbar={{
-                                left: 'prev,next today',
+                                left: 'prev,next today, filterButton',
                                 center: 'title',
                                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             }}
@@ -120,6 +140,9 @@ export default function Home() {
                 <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes]}>
                     <CreateEventDialog/>
                 </CreateDialogContext.Provider>
+                <FilterDialogContext.Provider value={[setShowFilterModal, showFilterModal, setEventTypes, eventTypes]}>
+                    <FilterEventDialog/>
+                </FilterDialogContext.Provider>
 
             </main>
         </>
