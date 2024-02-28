@@ -10,11 +10,14 @@ export function CreateEventDialog() {
     const [color, setColor] = React.useState('blue');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setNewEvent({...newEvent, title: e.target.value, color: color})
+        setNewEvent({...newEvent, title: e.target.value})
     }
 
-    const changeColor = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setColor(e.target.value);
+    const changeEventType = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const value: string[] = e.target.value.split(',');
+        setColor(value[1])
+        const newEventType : EventType = eventTypes.find((types: EventType) => types.id === Number(value[0]))
+        setNewEvent({...newEvent, eventType: newEventType, color: newEventType.color})
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -24,8 +27,7 @@ export function CreateEventDialog() {
     }
 
     function closeCreateModal() {
-        setNewEvent({title: '', start: '', allDay: false, id: 0, eventType: {id: 0, color: "green", iconUrl: "blueTeamUrl"}, color: color})
-        setColor("blue")
+        setNewEvent({title: '', start: '', allDay: false, id: 0, eventType: eventTypes[0], color: eventTypes[0].color})
         setShowCreateModal(false)
     }
 
@@ -69,11 +71,12 @@ export function CreateEventDialog() {
                                                 <input type="text" name="title" className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6" value={newEvent.title} onChange={(e) => handleChange(e)} placeholder="Title"/>
                                             </div>
                                             <div className="mt-2">
-                                                <select name="selectedGroup" onChange={changeColor} style={{color: color}} className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6">
+                                                <select name="selectedGroup" onChange={changeEventType} style={{color: color}} className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6">
                                                     {
                                                         eventTypes.map((item: EventType) => {
                                                             return (
-                                                                <option key={item.id} style={{color: item.color}} value={item.color}>{item.name}</option>
+                                                                // @ts-ignore
+                                                                <option id={item.id} style={{color: item.color}} value={[item.id.toString(), item.color]}>{item.name}</option>
                                                             );
                                                         })
                                                     }
@@ -82,7 +85,6 @@ export function CreateEventDialog() {
                                             <div className="form-outline mt-2">
                                                 <textarea className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6" style={{textIndent: "5px"}} id="textAreaExample1" rows={4} placeholder={"Description"}></textarea>
                                             </div>
-
                                             <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                                                 <button type="submit" className="inline-flex w-full justify-center rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 sm:col-start-2 disabled:opacity-25" disabled={newEvent.title === ''}>
                                                     Create

@@ -2,7 +2,6 @@ import React, {Fragment, useContext, useEffect, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {CheckIcon} from "@heroicons/react/20/solid";
 import {FilterDialogContext} from "@/app/components/dialogs/DialogContext";
-import makeAnimated from 'react-select/animated';
 import {EventType, EventTypeOption} from "@/app/EventObjects";
 import Select, {StylesConfig} from 'react-select';
 import chroma from 'chroma-js';
@@ -34,12 +33,13 @@ export function FilterEventDialog() {
     const adjustDialogHeight = () => {
         const dialog = document.getElementById('filter-dialog');
         if (dialog) {
-            dialog.style.height = !isOpen ? '60vh' : '60vh';
+            dialog.style.height = isOpen ? '35vh' : '60vh';
         }
     };
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
+
         closeFilterModal()
     }
 
@@ -164,8 +164,8 @@ export function FilterEventDialog() {
                                                 <Select
                                                     id="filter-option-select"
                                                     closeMenuOnSelect={false}
-                                                    onMenuOpen={toggleDropdown}
-                                                    onMenuClose={toggleDropdown}
+                                                    onMenuOpen={() => toggleDropdown()}
+                                                    onMenuClose={() => toggleDropdown()}
                                                     menuIsOpen={isOpen}
                                                     onChange={changeFilter}
                                                     isMulti
