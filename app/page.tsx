@@ -1,10 +1,10 @@
 "use client"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, {Draggable, DropArg} from '@fullcalendar/interaction'
+import interactionPlugin, {Draggable, DropArg, EventDragStartArg, EventDragStopArg} from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
-import {EventSourceInput} from '@fullcalendar/core/index.js'
+import {EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
 import {DeleteEventDialog} from "@/app/components/dialogs/DeleteEventDialog";
 import {CreateDialogContext, DeleteDialogContext, FilterDialogContext} from './components/dialogs/DialogContext'
 import {CreateEventDialog} from "@/app/components/dialogs/CreateEventDialog";
@@ -49,7 +49,7 @@ export default function Home() {
     useEffect(() => {
         setFilteredEvents(filterEvents(allEvents))
         console.log(allEvents, filteredEvents, 'use effect after change shows all event')
-    }, [showFilterModal, showCreateModal, showDeleteModal]);
+    }, [showFilterModal, allEvents]);
 
     useEffect(() => {
         let draggableEl = document.getElementById('draggable-el')
@@ -59,9 +59,8 @@ export default function Home() {
                 eventData: function (eventEl) {
                     let title = eventEl.getAttribute("title")
                     let id = eventEl.getAttribute("id")
-                    let eventType = eventEl.getAttribute("type")
                     let start = eventEl.getAttribute("start")
-                    return {title, id, eventType, start}
+                    return {title, id, start}
                 }
             })
         }
@@ -81,14 +80,42 @@ export default function Home() {
     }
 
     function addEvent(data: DropArg) {
-        const eventType: EventType = JSON.parse(data.draggedEl.getAttribute('type') as string)
-        const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number( data.draggedEl.getAttribute('id')), eventType: eventType, color: data.draggedEl.style.backgroundColor}
+        const eventTypeId: number = Number(data.draggedEl.getAttribute('eventType') )
+
+        // @ts-ignore
+        const eventType = eventTypes.find((types: EventType) => types.id === eventTypeId)
+        const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number( data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
         setAllEvents([...allEvents, event])
     }
 
     function handleDeleteModal(data: { event: { id: string } }) {
         setShowDeleteModal(true)
         setIdToDelete(Number(data.event.id))
+    }
+
+    function dropEvent(data: EventDropArg) {
+        console.log(data.event.title + " was dropped on " + data.event.start )
+        const event = allEvents.find(event => event.id === Number(data.event.id))
+        if (event){
+            event.allDay = data.event.allDay
+            // @ts-ignore
+            event.start = data.event.start.toISOString()
+
+            console.log(data.event.title + " event updated " + data.event.start )
+
+        }
+
+        // @ts-ignore
+        // if (!confirm(data.event.title + " was dropped on " + data.event.start + "\n\nAre you sure about this change?")) {
+        //     data.revert();
+        // }
+    }
+
+
+    function dragStartEvent(data: EventDragStartArg  ) {
+        // @ts-ignore
+        alert(data.event.title + " was picked on " + data.event.start);
+
     }
 
     return (
@@ -124,10 +151,14 @@ export default function Home() {
                             nowIndicator={true}
                             editable={true}
                             droppable={true}
+                            eventDurationEditable={true}
                             selectable={true}
                             selectMirror={true}
                             dateClick={handleDateClick}
                             drop={(data) => addEvent(data)}
+                            eventDrop={(data: EventDropArg) => dropEvent(data)}
+                            // eventDragStart={(data: EventDragStartArg) => dragStartEvent(data)}
+
                             eventClick={(data) => handleDeleteModal(data)}
                         />
                     </div>
@@ -138,7 +169,7 @@ export default function Home() {
                                 className="fc-event border-2 p-1 m-2 w-full rounded-md ml-auto text-center bg-white"
                                 title={event.title}
                                 id={event.id}
-                                type={JSON.stringify(event.eventType)}
+                                eventType={event.eventType.id}
                                 style={{backgroundColor: event.color}}
                             >
                                 {event.title}

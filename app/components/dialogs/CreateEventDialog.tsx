@@ -23,6 +23,7 @@ export function CreateEventDialog() {
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setAllEvents([...allEvents, newEvent])
+        setColor('blue')
         closeCreateModal()
     }
 
