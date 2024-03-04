@@ -49,7 +49,6 @@ export function FilterEventDialog() {
 
     function changeFilter(selectedEventTypesOption: EventTypeOption[]) {
 
-        console.log('start', selectedEventTypesOption);
 
         const option: EventTypeOption[] = filteredEventTypesOption.length > selectedEventTypesOption.length
             ? filteredEventTypesOption.filter((element) => !selectedEventTypesOption.includes(element))
@@ -58,12 +57,10 @@ export function FilterEventDialog() {
         eventTypes.map((eventType: EventType) => {
             if (eventType.id.toString() === option[0].value) {
                 eventType.isFiltered = eventType.isFiltered === undefined ? true : !eventType.isFiltered;
-                console.log(eventTypes, "new Event");
             }
         });
 
         setFilteredEventTypesOption(selectedEventTypesOption)
-        console.log('end', selectedEventTypesOption);
     }
 
     function resetFilter() {
