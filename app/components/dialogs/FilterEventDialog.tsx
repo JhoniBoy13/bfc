@@ -164,6 +164,7 @@ export function FilterEventDialog() {
                                                     onMenuOpen={() => toggleDropdown()}
                                                     onMenuClose={() => toggleDropdown()}
                                                     menuIsOpen={isOpen}
+                                                    // @ts-ignore
                                                     onChange={changeFilter}
                                                     isMulti
                                                     options={allEventTypesOptions}
