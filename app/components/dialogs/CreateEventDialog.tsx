@@ -30,7 +30,7 @@ export function CreateEventDialog() {
         setNewEvent({...newEvent, description: e.target.value})
     }
 
-    const changeEventType = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const changeEventType = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         const value: string[] = e.target.value.split(',');
         setColor(value[1])
         const newEventType : EventType = eventTypes.find((types: EventType) => types.id === Number(value[0]))
