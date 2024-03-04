@@ -6,12 +6,13 @@ import {EventType, Event} from "@/app/EventObjects";
 
 export function CreateEventDialog() {
 
-    const [setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal] = useContext(CreateDialogContext);
+    const [setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal, setIdToDelete , idToDelete] = useContext(CreateDialogContext);
     const [color, setColor] = React.useState(newEvent.eventType.color);
     const [eventIdIterator, setEventIdIterator] = useState<number>(5);
     const [isNewEvent, setIsNewEvent] = React.useState<boolean>();
 
     useEffect(() => {
+
         if (newEvent.id===eventIdIterator || newEvent.id===0){
             setNewEvent({...newEvent, id: eventIdIterator})
             setIsNewEvent(true) ;
@@ -39,20 +40,21 @@ export function CreateEventDialog() {
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         if (isNewEvent){
-            setAllEvents([...allEvents, newEvent])
             setEventIdIterator(eventIdIterator + 1)
         }
         else {
             const event = allEvents.find((event: Event) => event.id === Number(newEvent.id))
             if (event){
+                setAllEvents(allEvents.filter((event: Event) => Number(event.id) !== Number(newEvent.id)))
                 event.title = newEvent.title;
                 event.eventType = newEvent.eventType;
                 event.color = newEvent.eventType.color;
                 event.description = newEvent.description;
+                setNewEvent(event);
             }
             // setAllEvents({...allEvents})
         }
-
+        setAllEvents([...allEvents, newEvent])
         closeCreateModal();
     }
 
@@ -60,6 +62,11 @@ export function CreateEventDialog() {
         setNewEvent({title: '', start: '', allDay: false, id: 0, eventType: eventTypes[0], color: eventTypes[0].color})
         setShowCreateModal(false)
         console.log('creat model closed')
+    }
+
+    function openDeleteModal() {
+        setIdToDelete(newEvent.id)
+        setShowDeleteModal(true)
     }
 
     return (
@@ -111,7 +118,7 @@ export function CreateEventDialog() {
                                                         eventTypes.map((item: EventType) => {
                                                             return (
                                                                 // @ts-ignore
-                                                                <option selected={newEvent.eventType.id === item.id} id={item.id} style={{color: item.color}} value={[item.id.toString(), item.color]}>{item.name}</option>
+                                                                <option selected={newEvent.eventType.id === item.id} id={item.id} key={item.id}  style={{color: item.color}} value={[item.id.toString(), item.color]}>{item.name}</option>
                                                             );
                                                         })
                                                     }
@@ -125,7 +132,7 @@ export function CreateEventDialog() {
                                                     {isNewEvent ? 'Create': 'Update'}
                                                 </button>
                                                 {isNewEvent ? null :
-                                                    <button type="button" className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:col-start-3 disabled:opacity-25" onClick={() =>setShowDeleteModal(true)}> Delete </button>
+                                                    <button type="button" className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:col-start-3 disabled:opacity-25" onClick={()=>openDeleteModal()}> Delete </button>
                                                 }
                                                 <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0" onClick={closeCreateModal}>
                                                     Cancel

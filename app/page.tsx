@@ -46,12 +46,12 @@ export default function Home() {
     })
 
     useEffect(() => {
-        const fe = filterEvents(allEvents)
+        const filterEventsCopy = filterEvents(allEvents)
         console.log(allEvents, 'list of all event ')
         console.log(filteredEvents, 'list of all event shown')
-        setFilteredEvents(fe);
+        setFilteredEvents(filterEventsCopy);
 
-    }, [showFilterModal, showCreateModal]);
+    }, [showFilterModal, showCreateModal, showDeleteModal]);
 
     useEffect(() => {
         let draggableEl = document.getElementById('draggable-el')
@@ -66,8 +66,8 @@ export default function Home() {
                 }
             })
         }
-        const fe = filterEvents(allEvents)
-        setFilteredEvents(fe);
+        const filterEventsCopy = filterEvents(allEvents)
+        setFilteredEvents(filterEventsCopy);
 
     }, [])
 
@@ -191,7 +191,7 @@ export default function Home() {
                 <DeleteDialogContext.Provider value={[setShowDeleteModal, showDeleteModal, setAllEvents, allEvents, setIdToDelete , idToDelete]}>
                     <DeleteEventDialog/>
                 </DeleteDialogContext.Provider>
-                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal,]}>
+                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal, setIdToDelete , idToDelete]}>
                     <CreateEventDialog/>
                 </CreateDialogContext.Provider>
                 <FilterDialogContext.Provider value={[setShowFilterModal, showFilterModal, setEventTypes, eventTypes]}>

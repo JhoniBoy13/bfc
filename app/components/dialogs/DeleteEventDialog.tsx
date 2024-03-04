@@ -14,7 +14,6 @@ export function DeleteEventDialog() {
 
     function closeDeleteModal(){
         // @ts-ignore
-        setIdToDelete(-1)
         setShowDeleteModal(false)
     }
 
