@@ -188,10 +188,10 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
-                <DeleteDialogContext.Provider value={[setShowDeleteModal, showDeleteModal, setAllEvents, allEvents]}>
+                <DeleteDialogContext.Provider value={[setShowDeleteModal, showDeleteModal, setAllEvents, allEvents, setIdToDelete , idToDelete]}>
                     <DeleteEventDialog/>
                 </DeleteDialogContext.Provider>
-                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes]}>
+                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal,]}>
                     <CreateEventDialog/>
                 </CreateDialogContext.Provider>
                 <FilterDialogContext.Provider value={[setShowFilterModal, showFilterModal, setEventTypes, eventTypes]}>

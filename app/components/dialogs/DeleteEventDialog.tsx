@@ -13,7 +13,8 @@ export function DeleteEventDialog() {
     }
 
     function closeDeleteModal(){
-        setIdToDelete(null)
+        // @ts-ignore
+        setIdToDelete(-1)
         setShowDeleteModal(false)
     }
 

@@ -6,7 +6,7 @@ import {EventType, Event} from "@/app/EventObjects";
 
 export function CreateEventDialog() {
 
-    const [setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes] = useContext(CreateDialogContext);
+    const [setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal] = useContext(CreateDialogContext);
     const [color, setColor] = React.useState(newEvent.eventType.color);
     const [eventIdIterator, setEventIdIterator] = useState<number>(5);
     const [isNewEvent, setIsNewEvent] = React.useState<boolean>();
@@ -120,10 +120,13 @@ export function CreateEventDialog() {
                                             <div className="form-outline mt-2">
                                                 <textarea className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-violet-600 sm:text-sm sm:leading-6" style={{textIndent: "5px"}} id="textAreaExample1" rows={4} placeholder={"Description"} value={newEvent.description} onChange={(e) => handleDescriptionChange(e)} ></textarea>
                                             </div>
-                                            <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                                            <div className={`mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense  sm:gap-3 ${isNewEvent ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                                                 <button type="submit" className="inline-flex w-full justify-center rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 sm:col-start-2 disabled:opacity-25" disabled={newEvent.title === ''}>
                                                     {isNewEvent ? 'Create': 'Update'}
                                                 </button>
+                                                {isNewEvent ? null :
+                                                    <button type="button" className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:col-start-3 disabled:opacity-25" onClick={() =>setShowDeleteModal(true)}> Delete </button>
+                                                }
                                                 <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0" onClick={closeCreateModal}>
                                                     Cancel
                                                 </button>
