@@ -52,7 +52,6 @@ export function CreateEventDialog() {
                 event.description = newEvent.description;
                 setNewEvent(event);
             }
-            // setAllEvents({...allEvents})
         }
         setAllEvents([...allEvents, newEvent])
         closeCreateModal();

@@ -21,6 +21,6 @@ export interface EventTypeOption {
     readonly value: string;
     readonly label: string;
     readonly color: string;
-    readonly isFixed?: boolean;
+    isFiltered: boolean;
     readonly isDisabled?: boolean;
 }

@@ -2,18 +2,17 @@ import {Fragment, useContext} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
 import {DeleteDialogContext} from "@/app/components/dialogs/DialogContext";
+import {Event} from "@/app/EventObjects";
 
 export function DeleteEventDialog() {
 
     const [setShowDeleteModal,showDeleteModal,setAllEvents,allEvents,setIdToDelete,idToDelete] = useContext(DeleteDialogContext);
     function handleDelete() {
-        // @ts-ignore
-        setAllEvents(allEvents.filter(event => Number(event.id) !== Number(idToDelete)))
+        setAllEvents(allEvents.filter((event:Event) => Number(event.id) !== Number(idToDelete)))
         closeDeleteModal()
     }
 
     function closeDeleteModal(){
-        // @ts-ignore
         setShowDeleteModal(false)
     }
 

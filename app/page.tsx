@@ -1,10 +1,10 @@
 "use client"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, {Draggable, DropArg} from '@fullcalendar/interaction'
+import interactionPlugin, {DateClickArg, Draggable, DropArg, EventResizeDoneArg, EventResizeStartArg} from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
-import {EventChangeArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
+import {EventChangeArg, EventClickArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
 import {DeleteEventDialog} from "@/app/components/dialogs/DeleteEventDialog";
 import {CreateDialogContext, DeleteDialogContext, FilterDialogContext} from './components/dialogs/DialogContext'
 import {CreateEventDialog} from "@/app/components/dialogs/CreateEventDialog";
@@ -72,59 +72,40 @@ export default function Home() {
     }, [])
 
     function filterEvents(events: Event[]): Event[] {
-        // @ts-ignore
-
         return events.filter(event => event.eventType?.isFiltered === undefined || event.eventType?.isFiltered === false)
     }
 
-    function handleDateClick(arg: { date: Date, allDay: boolean }) {
-        setNewEvent({...newEvent, start: arg.date, allDay: arg.allDay})
+    function handleDateClick(data: DateClickArg) {
+        setNewEvent({...newEvent, start: data.date, allDay: data.allDay})
         setShowCreateModal(true)
     }
 
-    function handleEventClick(data: { event: { id: string } }) {
+    function handleEventClick(data: EventClickArg) {
         const event = allEvents.find(event => event.id === Number(data.event.id))
-        // @ts-ignore
-        setNewEvent(event)
+        if (event) setNewEvent(event)
         setShowCreateModal(true)
     }
 
     function addEvent(data: DropArg) {
-        const eventTypeId: number = Number(data.draggedEl.getAttribute('eventType') )
-
-        // @ts-ignore
+        const eventTypeId: number = Number(data.draggedEl.getAttribute('data-eventType'))
         const eventType = eventTypes.find((types: EventType) => types.id === eventTypeId)
-        const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number( data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
+        const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number(data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
         setAllEvents([...allEvents, event])
     }
 
-    function handleDeleteModal(data: { event: { id: string } }) {
-        setShowDeleteModal(true)
-        setIdToDelete(Number(data.event.id))
-    }
-
-    // @ts-ignore
-    function updateEvent(data) {
+    function updateEvent(data: EventChangeArg) {
         const event = allEvents.find(event => event.id === Number(data.event.id))
-        if (event){
+        if (event) {
             event.allDay = data.event.allDay
 
-            event.start = data.event.start.toISOString()
+            if (data.event.start)
+                event.start = data.event.start.toISOString()
 
-            event.color = data.event.color
-
-            if (data.event.end){
+            if (data.event.end) {
                 event.end = data.event.end.toISOString()
-
             }
-            console.log(data.event.title + " event updated " + data.event.start )
-
+            console.log(data.event.title + " event updated " + data.event)
         }
-
-        // @ts-ignore
-        // if (!confirm(data.event.title + " was dropped on " + data.event.start + "\n\nAre you sure about this change?")) {
-        //     data.revert();
-        // }
     }
 
     return (
@@ -163,12 +144,12 @@ export default function Home() {
                             eventDurationEditable={true}
                             selectable={true}
                             selectMirror={true}
-                            dateClick={handleDateClick}
-                            drop={(data) => addEvent(data)}
+                            dateClick={(data: DateClickArg) => handleDateClick(data)}
+                            drop={(data: DropArg) => addEvent(data)}
                             eventChange={(data: EventChangeArg) => updateEvent(data)}
                             eventDrop={(data: EventDropArg) => updateEvent(data)}
-                            eventResize={(data) => updateEvent(data)}
-                            eventClick={(data) => handleEventClick(data)}
+                            eventResize={(data: EventResizeDoneArg) => updateEvent(data)}
+                            eventClick={(data: EventClickArg) => handleEventClick(data)}
                         />
                     </div>
                     <div id="draggable-el" className="ml-8 w-full border-2 p-2 rounded-md mt-16 lg:h-1/2 bg-violet-50">
@@ -179,8 +160,7 @@ export default function Home() {
                                 title={event.title}
                                 id={event.id}
                                 key={event.id}
-                                // @ts-ignore
-                                eventType={event.eventType.id}
+                                data-eventType={event.eventType.id}
                                 style={{backgroundColor: event.color}}
                             >
                                 {event.title}
@@ -188,10 +168,10 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
-                <DeleteDialogContext.Provider value={[setShowDeleteModal, showDeleteModal, setAllEvents, allEvents, setIdToDelete , idToDelete]}>
+                <DeleteDialogContext.Provider value={[setShowDeleteModal, showDeleteModal, setAllEvents, allEvents, setIdToDelete, idToDelete]}>
                     <DeleteEventDialog/>
                 </DeleteDialogContext.Provider>
-                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal, setIdToDelete , idToDelete]}>
+                <CreateDialogContext.Provider value={[setShowCreateModal, showCreateModal, setAllEvents, allEvents, setNewEvent, newEvent, setEventTypes, eventTypes, setShowDeleteModal, showDeleteModal, setIdToDelete, idToDelete]}>
                     <CreateEventDialog/>
                 </CreateDialogContext.Provider>
                 <FilterDialogContext.Provider value={[setShowFilterModal, showFilterModal, setEventTypes, eventTypes]}>
@@ -201,4 +181,5 @@ export default function Home() {
             </main>
         </>
     )
+
 }
