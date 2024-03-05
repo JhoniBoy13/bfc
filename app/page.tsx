@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin, {DateClickArg, Draggable, DropArg, EventResizeDoneArg, EventResizeStartArg} from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
-import {EventChangeArg, EventClickArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
+import {DateSelectArg, DateUnselectArg, EventChangeArg, EventClickArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
 import {DeleteEventDialog} from "@/app/components/dialogs/DeleteEventDialog";
 import {CreateDialogContext, DeleteDialogContext, FilterDialogContext} from './components/dialogs/DialogContext'
 import {CreateEventDialog} from "@/app/components/dialogs/CreateEventDialog";
@@ -71,13 +71,24 @@ export default function Home() {
 
     }, [])
 
+
     function filterEvents(events: Event[]): Event[] {
         return events.filter(event => event.eventType?.isFiltered === undefined || event.eventType?.isFiltered === false)
     }
 
     function handleDateClick(data: DateClickArg) {
         setNewEvent({...newEvent, start: data.date, allDay: data.allDay})
+
         setShowCreateModal(true)
+    }
+
+    function handleDateSelect(data: DateSelectArg) {
+        console.log(data,'select')
+        if (!(data.start > newEvent.start && newEvent.end && data.end < newEvent.end)) {
+            setNewEvent({...newEvent, start: data.start, end: data.end, allDay: data.allDay})
+        }
+        console.log(newEvent,'newEvent')
+
     }
 
     function handleEventClick(data: EventClickArg) {
@@ -144,6 +155,7 @@ export default function Home() {
                             eventDurationEditable={true}
                             selectable={true}
                             selectMirror={true}
+                            select={((data:DateSelectArg) => handleDateSelect(data))}
                             dateClick={(data: DateClickArg) => handleDateClick(data)}
                             drop={(data: DropArg) => addEvent(data)}
                             eventChange={(data: EventChangeArg) => updateEvent(data)}
