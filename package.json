@@ -16,6 +16,8 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "chroma-js": "^2.4.2",
+    "mdb-react-ui-kit": "^7.2.0",
+    "mdbreact": "^5.2.0",
     "next": "13.4.13",
     "primereact": "^10.5.1",
     "react": "18.2.0",

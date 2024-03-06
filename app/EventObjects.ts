@@ -5,8 +5,9 @@ export interface Event {
     allDay: boolean;
     id: number;
     color: string;
-    eventType?: EventType;
+    eventType: EventType;
     description?: string;
+    isInCalendar?:boolean;
 }
 
 export interface EventType {

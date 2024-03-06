@@ -1,37 +1,32 @@
 "use client"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, {DateClickArg, Draggable, DropArg, EventResizeDoneArg, EventResizeStartArg} from '@fullcalendar/interaction'
+import interactionPlugin, {DateClickArg, Draggable, DropArg, EventResizeDoneArg} from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
-import {DateSelectArg, DateUnselectArg, EventChangeArg, EventClickArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
+import {DateSelectArg, EventChangeArg, EventClickArg, EventContentArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
 import {DeleteEventDialog} from "@/app/components/dialogs/DeleteEventDialog";
 import {CreateDialogContext, DeleteDialogContext, FilterDialogContext} from './components/dialogs/DialogContext'
 import {CreateEventDialog} from "@/app/components/dialogs/CreateEventDialog";
 import {Event, EventType} from "@/app/EventObjects";
 import {FilterEventDialog} from "@/app/components/dialogs/FilterEventDialog";
+// @ts-ignore
+import {ReactJSXElement} from "@emotion/react/types/jsx-namespace";
 
 
 export default function Home() {
 
     const [eventTypes, setEventTypes] = useState<EventType[]>([
-        {id: 0, color: "blue", name: "blue team", iconUrl: "blueTeamUrl"},
-        {id: 1, color: "green", name: " green team", iconUrl: "greenTeamUrl"},
-        {id: 2, color: "red", name: " red team", iconUrl: "redTeamUrl"},
-        {id: 3, color: "yellow", name: " yellow team", iconUrl: "yellowTeamUrl"},
+        {id: 0, color: "blue", name: "blue team", iconUrl: "https://www.w3schools.com/images/w3schools_green.jpg"},
+        {id: 1, color: "green", name: " green team", iconUrl: "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/man-person-icon.png"},
+        {id: 2, color: "red", name: " red team", iconUrl: "https://docs.snap.com/assets/images/creating-an-icon_creating_an_icon_world_example-a831f0c2b967e422d37120d99c9959e0.png"},
+        {id: 3, color: "yellow", name: " yellow team", iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmHX6I512gcFArlxwiw0Z7L9ilOTlRk9aQQA&usqp=CAU"},
     ])
 
-    const [events, setEvents] = useState([
-        {title: 'event 1', id: '1', eventType: eventTypes[0], color: eventTypes[0].color},
-        {title: 'event 2', id: '2', eventType: eventTypes[1], color: eventTypes[1].color},
-        {title: 'event 3', id: '3', eventType: eventTypes[0], color: eventTypes[0].color},
-        {title: 'event 4', id: '4', eventType: eventTypes[0], color: eventTypes[0].color},
-        {title: 'event 5', id: '5', eventType: eventTypes[0], color: eventTypes[0].color},
-    ])
+    // const [events, setEvents] = useState<Event[]>([])
 
     const [allEvents, setAllEvents] = useState<Event[]>([])
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
-
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showFilterModal, setShowFilterModal] = useState(false)
@@ -42,7 +37,8 @@ export default function Home() {
         allDay: false,
         id: 0,
         eventType: eventTypes[0],
-        color: eventTypes[0].color
+        color: eventTypes[0].color,
+        isInCalendar: true
     })
 
     useEffect(() => {
@@ -54,6 +50,23 @@ export default function Home() {
     }, [showFilterModal, showCreateModal, showDeleteModal]);
 
     useEffect(() => {
+        async function initializeEvents() {
+             setAllEvents([
+                {title: 'event 1', id: 1, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
+                {title: 'event 2', id: 2, eventType: eventTypes[1], color: eventTypes[1].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
+                {title: 'event 3', id: 3, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
+                {title: 'event 4', id: 4, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
+                {title: 'event 5', id: 5, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
+            ]);
+        }
+
+        initializeEvents().then(r => {
+            console.log(allEvents, 'all and events')
+        })
+    }, []);
+
+
+    useEffect(() => {
         let draggableEl = document.getElementById('draggable-el')
         if (draggableEl) {
             new Draggable(draggableEl, {
@@ -62,6 +75,12 @@ export default function Home() {
                     let title = eventEl.getAttribute("title")
                     let id = eventEl.getAttribute("id")
                     let start = eventEl.getAttribute("start")
+
+                    const newEvent = allEvents.find(event => event.id.toString() === id)
+                    if (newEvent) {
+                        newEvent.isInCalendar = true;
+                        setNewEvent(newEvent);
+                    }
                     return {title, id, start}
                 }
             })
@@ -71,9 +90,8 @@ export default function Home() {
 
     }, [])
 
-
     function filterEvents(events: Event[]): Event[] {
-        return events.filter(event => event.eventType?.isFiltered === undefined || event.eventType?.isFiltered === false)
+        return events.filter(event => (event.eventType?.isFiltered === undefined || event.eventType?.isFiltered === false) && (event.isInCalendar === true || event.isInCalendar === undefined))
     }
 
     function handleDateClick(data: DateClickArg) {
@@ -83,11 +101,11 @@ export default function Home() {
     }
 
     function handleDateSelect(data: DateSelectArg) {
-        console.log(data,'select')
+        console.log(data, 'select')
         if (!(data.start > newEvent.start && newEvent.end && data.end < newEvent.end)) {
             setNewEvent({...newEvent, start: data.start, end: data.end, allDay: data.allDay})
         }
-        console.log(newEvent,'newEvent')
+        console.log(newEvent, 'newEvent')
 
     }
 
@@ -98,10 +116,21 @@ export default function Home() {
     }
 
     function addEvent(data: DropArg) {
-        const eventTypeId: number = Number(data.draggedEl.getAttribute('data-eventType'))
-        const eventType = eventTypes.find((types: EventType) => types.id === eventTypeId)
-        const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number(data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
-        setAllEvents([...allEvents, event])
+        // const eventTypeId: number = Number(data.draggedEl.getAttribute('data-eventType'))
+        // const eventType = eventTypes.find((types: EventType) => types.id === eventTypeId)
+        // const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number(data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
+        // setAllEvents([...allEvents, event])
+
+        const event = allEvents.find(event => event.id === Number(data.draggedEl.id))
+        if (event) {
+            event.allDay = data.allDay
+            event.isInCalendar = true
+
+            if (data.date.toISOString())
+                event.start = data.date.toISOString()
+
+            console.log(event.title + " event added to clander at time  " + data.date.toTimeString())
+        }
     }
 
     function updateEvent(data: EventChangeArg) {
@@ -118,6 +147,22 @@ export default function Home() {
             console.log(data.event.title + " event updated " + data.event)
         }
     }
+
+    function extractImgUrl(id: string): string | undefined {
+        const event: Event | undefined = allEvents.find((event: Event) => event.id === Number(id))
+        if (event && event.eventType)
+            return event.eventType.iconUrl;
+    }
+
+    function renderEventContent(data: EventContentArg): ReactJSXElement {
+        return (
+            <div className={"justify-content-center flex-row "} style={{display: "flex"}}>
+                <img src={extractImgUrl(data.event.id)} className={' w-5 h-5'} alt={'t'}/>
+                <h1 className={""}>{data.event.title}</h1>
+            </div>
+        )
+    }
+
 
     return (
         <>
@@ -142,12 +187,12 @@ export default function Home() {
                                 }
                             }
                             }
-
                             headerToolbar={{
                                 left: 'prev,next today, filterButton',
                                 center: 'title',
                                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
                             }}
+                            eventContent={renderEventContent}
                             events={filteredEvents as EventSourceInput}
                             nowIndicator={true}
                             editable={true}
@@ -155,7 +200,7 @@ export default function Home() {
                             eventDurationEditable={true}
                             selectable={true}
                             selectMirror={true}
-                            select={((data:DateSelectArg) => handleDateSelect(data))}
+                            select={((data: DateSelectArg) => handleDateSelect(data))}
                             dateClick={(data: DateClickArg) => handleDateClick(data)}
                             drop={(data: DropArg) => addEvent(data)}
                             eventChange={(data: EventChangeArg) => updateEvent(data)}
@@ -166,11 +211,11 @@ export default function Home() {
                     </div>
                     <div id="draggable-el" className="ml-8 w-full border-2 p-2 rounded-md mt-16 lg:h-1/2 bg-violet-50">
                         <h1 className="font-bold text-lg text-center">Drag Event</h1>
-                        {events.map(event => (
+                        {allEvents.filter(event => event.isInCalendar === false).map(event => (
                             <div
                                 className="fc-event border-2 p-1 m-2 w-full rounded-md ml-auto text-center bg-white"
                                 title={event.title}
-                                id={event.id}
+                                id={event.id.toString()}
                                 key={event.id}
                                 data-eventType={event.eventType.id}
                                 style={{backgroundColor: event.color}}
