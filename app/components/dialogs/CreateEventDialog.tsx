@@ -60,7 +60,6 @@ export function CreateEventDialog() {
     function closeCreateModal() {
         setNewEvent({title: '', start: '', allDay: false, id: 0, eventType: eventTypes[0], color: eventTypes[0].color})
         setShowCreateModal(false)
-        console.log('creat model closed')
     }
 
     function openDeleteModal() {

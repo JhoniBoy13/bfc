@@ -39,13 +39,9 @@ export function FilterEventDialog() {
     function updateEventType(id: string, isFiltered: boolean) {
         const eventType: EventType = eventTypes.find((eventType: EventType) => eventType.id.toString() === id)
         eventType.isFiltered = isFiltered;
-        console.log(eventTypes, 'event types')
     }
 
     function changeFilter(newValue: OnChangeValue<EventTypeOption, true>, actionMeta: ActionMeta<EventTypeOption>) {
-        console.log('New Value:', newValue);
-        console.log('Action Meta:', actionMeta);
-
         switch (actionMeta.action) {
             case "select-option":
                 if (actionMeta.option) {

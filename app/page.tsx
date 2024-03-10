@@ -1,7 +1,7 @@
 "use client"
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, {DateClickArg, Draggable, DropArg, EventResizeDoneArg} from '@fullcalendar/interaction'
+import interactionPlugin, {DateClickArg, Draggable, DropArg, EventDragStartArg, EventResizeDoneArg} from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import React, {Fragment, useEffect, useState} from 'react'
 import {DateSelectArg, EventChangeArg, EventClickArg, EventContentArg, EventDropArg, EventSourceInput} from '@fullcalendar/core/index.js'
@@ -43,15 +43,13 @@ export default function Home() {
 
     useEffect(() => {
         const filterEventsCopy = filterEvents(allEvents)
-        console.log(allEvents, 'list of all event ')
-        console.log(filteredEvents, 'list of all event shown')
         setFilteredEvents(filterEventsCopy);
 
     }, [showFilterModal, showCreateModal, showDeleteModal]);
 
     useEffect(() => {
         async function initializeEvents() {
-             setAllEvents([
+            setAllEvents([
                 {title: 'event 1', id: 1, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
                 {title: 'event 2', id: 2, eventType: eventTypes[1], color: eventTypes[1].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
                 {title: 'event 3', id: 3, eventType: eventTypes[0], color: eventTypes[0].color, start: new Date().getTime().toString(), allDay: true, isInCalendar: false},
@@ -101,12 +99,9 @@ export default function Home() {
     }
 
     function handleDateSelect(data: DateSelectArg) {
-        console.log(data, 'select')
         if (!(data.start > newEvent.start && newEvent.end && data.end < newEvent.end)) {
             setNewEvent({...newEvent, start: data.start, end: data.end, allDay: data.allDay})
         }
-        console.log(newEvent, 'newEvent')
-
     }
 
     function handleEventClick(data: EventClickArg) {
@@ -115,12 +110,7 @@ export default function Home() {
         setShowCreateModal(true)
     }
 
-    function addEvent(data: DropArg) {
-        // const eventTypeId: number = Number(data.draggedEl.getAttribute('data-eventType'))
-        // const eventType = eventTypes.find((types: EventType) => types.id === eventTypeId)
-        // const event = {...newEvent, start: data.date.toISOString(), title: data.draggedEl.innerText, allDay: data.allDay, id: Number(data.draggedEl.getAttribute('id')), eventType: eventType ? eventType : eventTypes[0], color: eventType ? eventType.color : eventTypes[0].color}
-        // setAllEvents([...allEvents, event])
-
+    function addEventToCalendar(data: DropArg) {
         const event = allEvents.find(event => event.id === Number(data.draggedEl.id))
         if (event) {
             event.allDay = data.allDay
@@ -129,10 +119,8 @@ export default function Home() {
             if (data.date.toISOString())
                 event.start = data.date.toISOString()
 
-            console.log(event.title + " event added to clander at time  " + data.date.toTimeString())
         }
     }
-
     function updateEvent(data: EventChangeArg) {
         const event = allEvents.find(event => event.id === Number(data.event.id))
         if (event) {
@@ -144,7 +132,6 @@ export default function Home() {
             if (data.event.end) {
                 event.end = data.event.end.toISOString()
             }
-            console.log(data.event.title + " event updated " + data.event)
         }
     }
 
@@ -156,13 +143,12 @@ export default function Home() {
 
     function renderEventContent(data: EventContentArg): ReactJSXElement {
         return (
-            <div className={"justify-content-center flex-row "} style={{display: "flex"}}>
+            <div className={"justify-content-center flex-row fc-event"} style={{display: "flex"}}>
                 <img src={extractImgUrl(data.event.id)} className={' w-5 h-5'} alt={'t'}/>
                 <h1 className={""}>{data.event.title}</h1>
             </div>
         )
     }
-
 
     return (
         <>
@@ -202,13 +188,15 @@ export default function Home() {
                             selectMirror={true}
                             select={((data: DateSelectArg) => handleDateSelect(data))}
                             dateClick={(data: DateClickArg) => handleDateClick(data)}
-                            drop={(data: DropArg) => addEvent(data)}
+                            drop={(data: DropArg) => addEventToCalendar(data)}
                             eventChange={(data: EventChangeArg) => updateEvent(data)}
                             eventDrop={(data: EventDropArg) => updateEvent(data)}
                             eventResize={(data: EventResizeDoneArg) => updateEvent(data)}
                             eventClick={(data: EventClickArg) => handleEventClick(data)}
+
                         />
                     </div>
+
                     <div id="draggable-el" className="ml-8 w-full border-2 p-2 rounded-md mt-16 lg:h-1/2 bg-violet-50">
                         <h1 className="font-bold text-lg text-center">Drag Event</h1>
                         {allEvents.filter(event => event.isInCalendar === false).map(event => (
@@ -217,6 +205,7 @@ export default function Home() {
                                 title={event.title}
                                 id={event.id.toString()}
                                 key={event.id}
+                                draggable
                                 data-eventType={event.eventType.id}
                                 style={{backgroundColor: event.color}}
                             >
@@ -234,7 +223,6 @@ export default function Home() {
                 <FilterDialogContext.Provider value={[setShowFilterModal, showFilterModal, setEventTypes, eventTypes]}>
                     <FilterEventDialog/>
                 </FilterDialogContext.Provider>
-
             </main>
         </>
     )
